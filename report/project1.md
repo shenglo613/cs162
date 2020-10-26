@@ -1,0 +1,17 @@
+Final Report for Project 1: User Programs
+=========================================
+
+## Changes made from initial design document
+### Task 1
+Instead of using a dynamically allocated array for **_arr_**, we decided to use a fixed, reasonably sized array to reduce complexity and the risk of bugs. What we defined as reasonable was 32 arguments since most programs won't need that many arguments. Additionally, rather than making a specialized function to push the arguments onto the stack, we decided to directly implement it in ```load()``` because the function would not be used anywhere else, and it only took a few number of lines to implement.
+
+### Task 2
+We had to change all of our original design in task 2 for multiple reasons. Firstly, our design failed on certain edge cases. For example, if a parent waits on a child, then that child does not free its resources until the parent thread exits, but we want it to be freed immediately after the wait. Secondly, the design was complicated and required multiple booleans that introduced more edge cases, such as ```wait()``` being called twice. We decided to use the simpler design that was given in the discussion section by keeping a **_wait_status_** struct to preserve a process's exit code.
+
+### Task 3
+We had to make slight changes to the data structures we added. We decided not to use the separate **_empty_fdt_** array since it takes up too much memory in the kernel which already has limited space. Since we removed the empty_fdt array, we instead just set the entry at a file descriptor to NULL on ```close``` and return the first NULL entry on ```open()```. A modification we made to **_fdt_** is to make it a fixed size array since dynamically-sized arrays are more difficult to implement than fixed ones. We got a taste of this difficulty just trying to allocate a fixed amount of memory for **__fdt__**. We could not allocate memory on the heap in ```init_thread()```, and we spents hours to find out that we had to allocate memory in ```start_process()```. We did not specify where **_fdt_** should go in our original design, but after our review we decided to put it in the kernel heap. We also did not specify where file descriptors and **_fdt_** are freed, which we put in **_thread_exit()_**.
+
+### Reflection
+We decided to work on this project in a "mob programming" kind of style, meaning that every time we wrote code, it would be together as a group. We all equally took turns and rotated between writing code, looking up function and struct details, and reading through project documentation. Mob programming did well to keep everybody on the same page and avoided issues that could come up with dividing work and having to integrate it. Also, by having four pairs of eyes looking at the code as it was being written, we were able to spot small and subtle bugs that would have been missed if the code was written independently.
+
+An area for improvement could be to divide up some of the work to obtain parallelism. For instance, the file system call handlers could have been implemented independently and the integration would not have been too difficult, but instead we decided to write it all together, which cost us a little more time. In the future, recognizing small sections that are acceptable to break up and integrate could help us parallize the workload and increase productivity. Despite that, we felt that mob programming did well to keep everybody on the same page and made writing code seamless.
